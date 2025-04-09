@@ -17,6 +17,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
             'image'    => 'nullable|image|max:2048',
             'cv'       => 'nullable|mimes:pdf,doc,docx|max:5120',
+            'video'    => 'nullable|mimetypes:video/mp4,video/avi,video/mpeg|max:20000', // أقصى حجم 20MB
         ]);
 
         if ($validator->fails()) {
@@ -25,6 +26,10 @@ class AuthController extends Controller
 
         $imagePath = null;
         $cvPath = null;
+        $videoPath = null;
+        if ($request->hasFile('video')) {
+            $videoPath = $request->file('video')->store('videos', 'public');
+        }
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('images', 'public');
@@ -50,6 +55,7 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'image' => $imagePath ? asset('storage/' . $imagePath) : null,
                 'cv'    => $cvPath ? asset('storage/' . $cvPath) : null,
+                'video' => $videoPath ? asset('storage/' . $videoPath) : null,
             ],
             'token' => $token,
         ]);
